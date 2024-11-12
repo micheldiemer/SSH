@@ -14,7 +14,7 @@ Le programme `ssh` permet de se connecter à un ordinateur en utilisant le proto
 
 Habituellement le protocole SSH utilise le port TCP 22. Il est particulièrement utilisé pour ouvrir un shell sur un ordinateur distant.
 
-L'ordinateur sur lequel on souhaite se connecter doit être un serveur ssh, il doit avoir un port SSH ouvert, le service correspondant activé et la connexion doit être autorisée. Certains hébergeurs de sites Internet autorisent la connexion ssh, d'autres non.
+L’ordinateur sur lequel on souhaite se connecter doit être un serveur ssh, il doit avoir un port SSH ouvert, le service correspondant activé et la connexion doit être autorisée. Certains hébergeurs de sites Internet autorisent la connexion ssh, d'autres non.
 
 Il est tout à fait possible d'utiliser ssh sous Windows.
 
@@ -55,10 +55,10 @@ La clé privée n'est connue que du client et doit rester privée. Toute personn
 
 La clé publique est connue du client et du serveur. Il y a un lien mathématique entre les deux clés.
 
-1. Le client connaît la clé publique et privée
-2. Le serveur connaît la clé publique
-3. Le client effectue un calcul à partir de la clé publique et privée et envoie cela au serveur
-4. Le serveur utilise la valeur envoyée par le client pour vérifier si une des clés publiques qui sont autorisées correspond à cette valeur et si oui il autorise la connexion
+1. Le client connaît sa clé publique et sa clé privée
+1. Le serveur autorise une liste de clés publiques. Par exemple, la clé publique du client est ajoutée dans le fichier `authorized_keys` du serveur. Le serveur autorise tous les clients dont la clé publique est enregistrée.
+1. Le client effectue un calcul à partir de la clé publique et privée et envoie cela au serveur
+1. Le serveur utilise la valeur envoyée par le client pour vérifier si une des clés publiques qui sont autorisées correspond à cette valeur et si oui il autorise la connexion
 
 Les bases mathématiques des clés publiques et privées sont assez solides, il est théoriquement impossible de retrouver une clé privée dans un temps raisonnable avec la puissance actuelle des ordinateurs.
 
@@ -74,13 +74,13 @@ Pour le nom du fichier, une suggestion : `id_ed25519_<nom_machine>`
 - `-M <passphrase>` : facultatif, permet de mieux sécuriser la clé
 - `-f <nom_fichier>` : nom du fichier, typiquement dans le dossier `~/.ssh` (Linux) ou `%USERPROFILE%\.ssh` (Windows cmd).
 
-Cette commande créé deux fichiers, une clé publique et une clé privée qui sont liées mathématiquement. Le client va présenter sa clé privée pour se connecter. Le serveur a une liste de clés publiques autorisées à se connecter. Si le client reconnaît la clé privée, il autorise la connexion.
+Cette commande créé deux fichiers, une clé publique et une clé privée qui sont liées mathématiquement. Le client va présenter sa clé privée pour se connecter. Le serveur a une liste de clés publiques autorisées à se connecter. Si le serveur reconnaît la valeur envoyée par le client avec une clé connue, il autorise la connexion.
 
-Il faut maintenant copier la clé publique sur le serveur. On peut utlilser la commande `ssh-copy-id` ou le faire manuellement :
+La clé publique du client doit être déposée sur le serveur. On peut utlilser la commande `ssh-copy-id` ou le faire manuellement :
 
 1. Afficher le contenu de la clé publique : `cat <nom_fichier>.pub` ou `type <nom_fichier>.pub`
-2. Copier la clé publique
-3. Se connecter à la machine. Ouvrir le fichier `~/.ssh/authorized_keys` (le créer si nécessaire et en ajustant les permissions `touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys`).
+2. Copier la clé publique (copier/coller du système d’exploitation)
+3. Se connecter au serveur. Ouvrir le fichier `~/.ssh/authorized_keys` (le créer si nécessaire et en ajustant les permissions `touch ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys`).
 4. Ajouter une novelle ligne dans ce fichier en collant la clé publique.
 
 ### Ajout dans le fichier config
@@ -113,7 +113,7 @@ Host vm
   IdentityFile c:\Users\Michel\.ssh\id_ed25519_vm
   IdentitiesOnly yes
 
-Host github
+Host github.com
   Hostname ssh.github.com
   Port 443
   User micheldiemer
